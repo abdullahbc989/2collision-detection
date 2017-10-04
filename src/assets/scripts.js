@@ -13,10 +13,10 @@ const mouse = {
 };
 
 const colors = [
-	'#2185C5',
-	'#7ECEFD',
-	'#FFF6E5',
-	'#FF7F66'
+	'#fcba21',
+	'#f05321',
+	'#024da1',
+	'#f072ac'
 ];
 
 
@@ -122,12 +122,13 @@ function Particle(x, y, radius, color) {
 	this.x = x;
 	this.y = y;
 	this.velocity = {
-	    x: Math.random() - 0.5,
-	    y: Math.random() - 0.5
+	    x: (Math.random() - 0.5) * 5,
+	    y: (Math.random() - 0.5) * 5
 	};
 	this.radius = radius;
 	this.color = color;
 	this.mass = 1;
+	this.opacity = 0;
 
 	this.update = particles => {
 		this.draw();
@@ -148,6 +149,16 @@ function Particle(x, y, radius, color) {
 		    this.velocity.y = -this.velocity.y;
 		}
 
+		// mouse collision detection
+		// && this.opacity < 0.2
+		if (distance(mouse.x, mouse.y, this.x, this.y) < 120) {
+            this.opacity += 0.02;
+		} else if (this.opacity > 0) {
+		    this.opacity -= 0.02;
+
+		    this.opacity = Math.max(0, this.opacity);
+		}
+
 		this.x += this.velocity.x;
 		this.y += this.velocity.y;
 	};
@@ -155,6 +166,11 @@ function Particle(x, y, radius, color) {
 	this.draw = () => {
 		c.beginPath();
 		c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+		c.save();
+		c.globalAlpha = this.opacity;
+		c.fillStyle = this.color;
+		c.fill();
+		c.restore();
 		c.strokeStyle = this.color;
 		c.stroke();
 		c.closePath();
@@ -167,11 +183,11 @@ let particles;
 function init() {
 	particles = []
 
-	for (let i = 0; i < 4; i++) {
-	    const radius = 80;
+	for (let i = 0; i < 400; i++) {
+	    const radius = 15;
 	    let x = randomIntFromRange(radius, canvas.width - radius);
 	    let y = randomIntFromRange(radius, canvas.height - radius);
-	    const color = 'blue'
+	    const color = randomColor(colors);
 
 	    if (i !== 0) {
 	        for (let j = 0; j < particles.length; j++) {
